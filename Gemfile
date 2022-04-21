@@ -35,6 +35,7 @@ group :development, :test do
   gem "pry-byebug"
   gem "pry-doc"
   gem "pry-rails"
+  gem "rack-cors"
   gem "rspec-rails"
   gem "rubocop-rails"
   gem "rubocop-rspec"
