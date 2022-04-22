@@ -9,10 +9,10 @@
 #  confirmation_sent_at   :datetime
 #  confirmation_token     :string
 #  confirmed_at           :datetime
-#  email                  :string
+#  email                  :string           default("sample@example.com"), not null
 #  encrypted_password     :string           default(""), not null
 #  image                  :string
-#  name                   :string
+#  name                   :string           default("unknown"), not null
 #  provider               :string           default("email"), not null
 #  remember_created_at    :datetime
 #  reset_password_sent_at :datetime
