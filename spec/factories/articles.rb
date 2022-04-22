@@ -19,8 +19,30 @@
 #
 FactoryBot.define do
   factory :article do
-    title { "MyString" }
-    body { "MyText" }
-    user { nil }
+    title { Faker::Lorem.characters(number: 10) }
+    body { Faker::Lorem.characters(number: 10) }
+    user
+
+    trait :with_comments do
+      after(:build) do |article|
+        user = create(:user)
+        create(:comment, article: article, user: user)
+      end
+    end
+
+    trait :with_article_likes do
+      after(:build) do |article|
+        user = create(:user)
+        create(:article_like, article: article, user: user)
+      end
+    end
+
+    trait :with_article_likes_with_comments do
+      after(:build) do |article|
+        user = create(:user)
+        create(:article_like, article: article, user: user)
+        create(:comment, article: article, user: user)
+      end
+    end
   end
 end
