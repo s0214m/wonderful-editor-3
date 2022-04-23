@@ -3,7 +3,7 @@
 # Table name: comments
 #
 #  id         :bigint           not null, primary key
-#  body       :text
+#  body       :text             default("Comment"), not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  article_id :bigint           not null
@@ -21,7 +21,7 @@
 #
 FactoryBot.define do
   factory :comment do
-    body { "MyText" }
+    body { Faker::Lorem.characters(number: 10) }
     user
     article
   end
