@@ -31,5 +31,44 @@
 require "rails_helper"
 
 RSpec.describe User, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  context "name, email, passwordが存在する時" do
+    let(:user) { build(:user) }
+    it "ユーザーが作られる" do
+      expect(user).to be_valid
+    end
+  end
+
+  context "nameが存在しない時" do
+    let(:user) { build(:user, name: nil) }
+    it "ユーザーが作られない" do
+      expect(user).to be_invalid
+      expect(user.errors.messages[:name]).to include("can't be blank")
+    end
+  end
+
+  context "emailが存在しない時" do
+    let(:user) { build(:user, email: nil) }
+    it "ユーザーが作られない" do
+      expect(user).to be_invalid
+      expect(user.errors.messages[:email]).to include("can't be blank")
+    end
+  end
+
+  context "passwordが存在しない時" do
+    let(:user) { build(:user, password: nil) }
+    it "ユーザーが作られない" do
+      expect(user).to be_invalid
+      expect(user.errors.messages[:password]).to include("can't be blank")
+    end
+  end
+
+  context "同じemailが既に存在する時" do
+    before { create(:user, email: "user1@test.com") }
+
+    it "ユーザーが作られない" do
+      user = build(:user, email: "user1@test.com")
+      expect(user).to be_invalid
+      expect(user.errors.messages[:email]).to include("has already been taken")
+    end
+  end
 end
