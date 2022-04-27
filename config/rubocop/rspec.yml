@@ -63,3 +63,9 @@ RSpec/ReturnFromStub:
 
 RSpec/MultipleExpectations:
   Max: 20
+
+RSpec/LetSetup:
+  Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
