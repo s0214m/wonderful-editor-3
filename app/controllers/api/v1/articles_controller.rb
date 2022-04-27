@@ -21,7 +21,7 @@ class Api::V1::ArticlesController < Api::V1::BaseApiController
   end
 
   def destroy
-    article = Article.find(params[:id])
+    article = current_user.articles.find(params[:id])
     article.destroy!
   end
 
