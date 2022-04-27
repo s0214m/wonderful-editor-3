@@ -23,7 +23,7 @@ RSpec.describe "/api/v1/articles", type: :request do
   describe " Get #show" do
     subject { get(api_v1_article_path(article_id)) }
 
-    context "全ての情報がある時" do
+    context "適切なIDを指定した時" do
       let(:article_id) { article.id }
       let(:article) { create(:article) }
       it "その投稿を表示できる" do
@@ -40,7 +40,7 @@ RSpec.describe "/api/v1/articles", type: :request do
       end
     end
 
-    context "指定したidが異なるとき" do
+    context "不適切なIDを指定した時" do
       let(:article_id) { 1_000_000 }
       let(:article) { create(:article) }
       it "その投稿を表示できない" do
@@ -53,16 +53,38 @@ RSpec.describe "/api/v1/articles", type: :request do
     subject { post(api_v1_articles_path, params: params) }
 
     let!(:current_user) { create(:user) }
+    let(:params) { { article: attributes_for(:article) } }
     before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
 
-    context "全ての情報がある時" do
-      let(:params) { { article: attributes_for(:article) } }
+    it "投稿を作成できる" do
+      expect { subject }.to change { Article.where(user_id: current_user.id).count }.by(1)
+      res = JSON.parse(response.body)
+      expect(res["title"]).to eq params[:article][:title]
+      expect(res["body"]).to eq params[:article][:body]
+      expect(res["updated_at"]).to be_present
+      expect(res["user"]["id"]).to eq current_user.id
+      expect(res["user"]["name"]).to eq current_user.name
+      expect(res["user"]["email"]).to eq current_user.email
+      expect(response).to have_http_status(:ok)
+    end
+  end
 
-      it "投稿を作成できる" do
-        expect { subject }.to change { Article.where(user_id: current_user.id).count }.by(1)
+  describe "PATCH #update" do
+    subject { patch(api_v1_article_path(article_id), params: params) }
+
+    let!(:article1) { create(:article, user: current_user) }
+    let!(:article2) { create(:article, user: current_user) }
+    let(:params) { { article: attributes_for(:article) } }
+    let(:current_user) { create(:user) }
+    before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
+
+    context "自分の投稿を更新しようとした時" do
+      let(:article_id) { article1.id }
+
+      it "更新できる" do
+        expect { subject }.to change { current_user.articles.find(article_id).title }.from(article1.title).to(params[:article][:title]) &
+                              change { current_user.articles.find(article_id).body }.from(article1.body).to(params[:article][:body])
         res = JSON.parse(response.body)
-        expect(res["title"]).to eq params[:article][:title]
-        expect(res["body"]).to eq params[:article][:body]
         expect(res["updated_at"]).to be_present
         expect(res["user"]["id"]).to eq current_user.id
         expect(res["user"]["name"]).to eq current_user.name
@@ -71,21 +93,12 @@ RSpec.describe "/api/v1/articles", type: :request do
       end
     end
 
-    context "タイトルがない時" do
-      let!(:current_user) { create(:user) }
-      let(:params) { { article: attributes_for(:article, title: nil) } }
-      it "投稿を作成できない" do
-        expect { subject }.to change { Article.count }.by(0) &
-                              raise_error(ActiveRecord::RecordInvalid)
-      end
-    end
-
-    context "本文がない時" do
-      let!(:current_user) { create(:user) }
-      let(:params) { { article: attributes_for(:article, body: nil) } }
-      it "投稿を作成できない" do
-        expect { subject }.to change { Article.count }.by(0) &
-                              raise_error(ActiveRecord::RecordInvalid)
+    context "他人の投稿を更新しようとした時" do
+      let(:other_user) { create(:user) }
+      let(:article3) { create(:article, user: other_user) }
+      let(:article_id) { article3.id }
+      it "更新できない" do
+        expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end
