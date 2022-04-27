@@ -25,8 +25,8 @@ ActiveRecord::Schema.define(version: 2022_04_21_231844) do
   end
 
   create_table "articles", force: :cascade do |t|
-    t.string "title", default: "Title", null: false
-    t.text "body", default: "Content", null: false
+    t.string "title", null: false
+    t.text "body", null: false
     t.bigint "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -34,7 +34,7 @@ ActiveRecord::Schema.define(version: 2022_04_21_231844) do
   end
 
   create_table "comments", force: :cascade do |t|
-    t.text "body", default: "Comment", null: false
+    t.text "body", null: false
     t.bigint "user_id", null: false
     t.bigint "article_id", null: false
     t.datetime "created_at", precision: 6, null: false
