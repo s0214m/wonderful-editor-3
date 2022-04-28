@@ -57,7 +57,7 @@ RSpec.describe "/api/v1/articles", type: :request do
     before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
 
     it "投稿を作成できる" do
-      expect { subject }.to change { Article.where(user_id: current_user.id).count }.by(1)
+      expect { subject }.to change { current_user.articles.count }.by(1)
       res = JSON.parse(response.body)
       expect(res["title"]).to eq params[:article][:title]
       expect(res["body"]).to eq params[:article][:body]
@@ -112,7 +112,7 @@ RSpec.describe "/api/v1/articles", type: :request do
     context "自分の投稿を削除しようとした時" do
       let!(:article) { create(:article, user: current_user) }
       it "削除できる" do
-        expect { subject }.to change { current_user.articles.reload.count }.by(-1)
+        expect { subject }.to change { current_user.articles.count }.by(-1)
         expect(response).to have_http_status(:no_content)
       end
     end
