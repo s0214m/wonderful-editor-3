@@ -59,6 +59,7 @@ RSpec.describe "/api/v1/articles", type: :request do
     it "投稿を作成できる" do
       expect { subject }.to change { current_user.articles.count }.by(1)
       res = JSON.parse(response.body)
+      expect(res["id"]).to eq current_user.articles.last.id
       expect(res["title"]).to eq params[:article][:title]
       expect(res["body"]).to eq params[:article][:body]
       expect(res["updated_at"]).to be_present
@@ -82,8 +83,8 @@ RSpec.describe "/api/v1/articles", type: :request do
       let(:article_id) { article1.id }
 
       it "更新できる" do
-        expect { subject }.to change { current_user.articles.find(article_id).title }.from(article1.title).to(params[:article][:title]) &
-                              change { current_user.articles.find(article_id).body }.from(article1.body).to(params[:article][:body])
+        expect { subject }.to change { article1.reload.title }.from(article1.title).to(params[:article][:title]) &
+                              change { article1.reload.body }.from(article1.body).to(params[:article][:body])
         res = JSON.parse(response.body)
         expect(res["updated_at"]).to be_present
         expect(res["user"]["id"]).to eq current_user.id
