@@ -28,6 +28,52 @@ RSpec.describe "Api::V1::Auth::Registrations", type: :request do
       end
     end
 
+    # バリデーションのようなテストをするがrequestに対してテストしているので意味がある
+    context "nameがない時" do
+      let(:params) { attributes_for(:user, name: nil) }
+      it "ユーザーが作成できない" do
+        expect { subject }.to change { User.count }.by(0)
+        res = JSON.parse(response.body)
+        expect(res["status"]).to eq "error"
+        expect(res["errors"]["name"]).to include("can't be blank")
+        expect(response).to have_http_status(:unprocessable_entity)
+        headers = response.headers
+        expect(headers["access-token"]).not_to be_present
+        expect(headers["client"]).not_to be_present
+        expect(headers["uid"]).not_to be_present
+      end
+    end
+
+    context "emailがない時" do
+      let(:params) { attributes_for(:user, email: nil) }
+      it "ユーザーが作成できない" do
+        expect { subject }.to change { User.count }.by(0)
+        res = JSON.parse(response.body)
+        expect(res["status"]).to eq "error"
+        expect(res["errors"]["email"]).to include("can't be blank")
+        expect(response).to have_http_status(:unprocessable_entity)
+        headers = response.headers
+        expect(headers["access-token"]).not_to be_present
+        expect(headers["client"]).not_to be_present
+        expect(headers["uid"]).not_to be_present
+      end
+    end
+
+    context "passwordがない時" do
+      let(:params) { attributes_for(:user, password: nil) }
+      it "ユーザーが作成できない" do
+        expect { subject }.to change { User.count }.by(0)
+        res = JSON.parse(response.body)
+        expect(res["status"]).to eq "error"
+        expect(res["errors"]["password"]).to include("can't be blank")
+        expect(response).to have_http_status(:unprocessable_entity)
+        headers = response.headers
+        expect(headers["access-token"]).not_to be_present
+        expect(headers["client"]).not_to be_present
+        expect(headers["uid"]).not_to be_present
+      end
+    end
+
     context "不適切なemailを送信した時" do
       let(:params) { { name: "user1", email: "a@g", password: "password" } }
       it "ユーザーが作成できない" do
