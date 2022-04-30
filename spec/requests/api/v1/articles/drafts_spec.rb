@@ -1,14 +1,16 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Articles::Drafts", type: :request do
+  let(:headers) { current_user.create_new_auth_token }
+  let(:current_user) { create(:user) }
+
   describe "GET #index" do
     subject { get(api_v1_articles_drafts_path, headers: headers) }
 
-    let(:headers) { current_user.create_new_auth_token }
-    let(:current_user) { create(:user) }
     let!(:article1) { create(:article, updated_at: 1.day.ago, status: "draft", user: current_user) }
     let!(:article2) { create(:article, updated_at: 2.day.ago, status: "published", user: current_user) }
     let!(:article3) { create(:article, updated_at: 3.day.ago, status: "draft", user: current_user) }
+
     it "自分の下書き記事が全て表示できる" do
       subject
       res = JSON.parse(response.body)
@@ -24,9 +26,6 @@ RSpec.describe "Api::V1::Articles::Drafts", type: :request do
 
   describe " Get #show" do
     subject { get(api_v1_articles_draft_path(article_id), headers: headers) }
-
-    let(:current_user) { create(:user) }
-    let(:headers) { current_user.create_new_auth_token }
 
     context "適切なIDを指定し" do
       let(:article_id) { article.id }
