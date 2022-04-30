@@ -1,4 +1,6 @@
 class Api::V1::ArticlesController < Api::V1::BaseApiController
+  skip_before_action :authenticate_user!, only: %i[index show]
+
   def index
     articles = Article.preload(:user).order(updated_at: :desc)
     render json: articles, each_serializer: Api::V1::ArticlePreviewSerializer
@@ -26,10 +28,6 @@ class Api::V1::ArticlesController < Api::V1::BaseApiController
   end
 
   private
-
-    def set_article
-      @article = Article.find(params[:id])
-    end
 
     def article_params
       params.require(:article).permit(:title, :body)
