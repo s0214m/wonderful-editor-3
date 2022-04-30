@@ -176,7 +176,7 @@ RSpec.describe "/api/v1/articles", type: :request do
       let(:other_user) { create(:user) }
       let(:article) { create(:article, user: other_user, status: "published") }
       let(:article_id) { article.id }
-      fit "更新できない" do
+      it "更新できない" do
         expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
