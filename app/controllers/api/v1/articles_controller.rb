@@ -2,12 +2,12 @@ class Api::V1::ArticlesController < Api::V1::BaseApiController
   skip_before_action :authenticate_user!, only: %i[index show]
 
   def index
-    articles = Article.preload(:user).order(updated_at: :desc)
+    articles = Article.preload(:user).published.order(updated_at: :desc)
     render json: articles, each_serializer: Api::V1::ArticlePreviewSerializer
   end
 
   def show
-    article = Article.find(params[:id])
+    article = Article.published.find(params[:id])
     render json: article, serializer: Api::V1::ArticleSerializer
   end
 
