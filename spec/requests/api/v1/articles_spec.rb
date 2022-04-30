@@ -97,6 +97,13 @@ RSpec.describe "/api/v1/articles", type: :request do
         expect(response).to have_http_status(:ok)
       end
     end
+
+    context "不適切なstatusを送信した時" do
+      let(:params) { { article: attributes_for(:article, status: "unpublished") } }
+      it "エラーする" do
+        expect { subject }.to raise_error(ArgumentError)
+      end
+    end
   end
 
   describe "PATCH #update" do
