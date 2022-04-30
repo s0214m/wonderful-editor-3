@@ -9,7 +9,7 @@ RSpec.describe "Api::V1::Auth::Sessions", type: :request do
     context "適切な情報を送信した時" do
       let(:params) { { email: current_user.email, password: current_user.password } }
       it "ログインできる" do
-        subject
+        expect { subject }.to change { current_user.reload.tokens }.from(be_blank).to(be_present)
         res = JSON.parse(response.body)["data"]
         expect(res["id"]).to eq current_user.id
         expect(res["name"]).to eq current_user.name
@@ -66,7 +66,15 @@ RSpec.describe "Api::V1::Auth::Sessions", type: :request do
   describe "DELETE /destroy" do
     subject { delete(destroy_api_v1_user_session_path, headers: headers) }
 
-    it "aaa" do
+    context "ログインしているユーザーがいる時" do
+      let(:current_user) { create(:user) }
+      let!(:headers) { current_user.create_new_auth_token }
+      it "ログアウトできる" do
+        expect { subject }.to change { current_user.reload.tokens }.from(be_present).to(be_blank)
+        res = JSON.parse(response.body)
+        expect(res["success"]).to eq true
+        expect(response).to have_http_status(:ok)
+      end
     end
   end
 end
