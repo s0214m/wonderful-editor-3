@@ -24,6 +24,8 @@ gem "devise_token_auth"
 
 gem "devise"
 
+gem "config"
+
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", ">= 1.4.2", require: false
 
